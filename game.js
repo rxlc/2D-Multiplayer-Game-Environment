@@ -25,7 +25,7 @@
     
     var markers = [];
     
-    var cores = [];
+    var utilities = [];
   
     var vWidth = Math.min(room.width, canvas.width);
     var vHeight = Math.min(room.height, canvas.height);
@@ -39,11 +39,23 @@
     var delay = 0;
     
     var debounce = false;
-  
+
     var camera = new Game.Camera(0, 0, vWidth, vHeight, room.width, room.height);
     camera.follow(followObject, vWidth / 2, vHeight / 2);
     camera.boundaryLock = false
-    
+        
+    Game.activePlayer = player
+    Game.activeCamera = camera
+    Game.activefollowObject = followObject
+    Game.activeEnemy = enemy
+    Game.markers = markers
+    Game.projectiles = projectiles
+    Game.utilities = utilities
+    Game.firing = firing
+    Game.debounce = debounce
+    Game.delay = delay
+    Game.enemies = enemies
+
     var update = function() {
       followObject.update(camera.xView,camera.yView);
       
@@ -61,8 +73,8 @@
         markers[i].update(Game.markers)
       }
       
-      for (let i=0; i<cores.length; i++) {
-        cores[i].update(Game.cores)
+      for (let i=0; i<utilities.length; i++) {
+        utilities[i].update(Game.utilities)
       }
       
       camera.update();
@@ -78,6 +90,13 @@
             Game.debounce = false;
           }
         }
+      } else {
+        if (Game.delay >= Game.activePlayer.fireDelay || Game.delay == 0) {
+          Game.delay = 0;
+          Game.debounce = false;
+        } else {
+          Game.delay++;
+        }
       }
     }
   
@@ -86,15 +105,15 @@
       
       room.map.draw(context, camera.xView, camera.yView);
       
-      for (let i=0;i< cores.length; i++) {
-        cores[i].draw(context,camera.xView,camera.yView)
+      for (let i=0;i< utilities.length; i++) {
+        utilities[i].draw(context,camera.xView,camera.yView)
       }
       
       for (let i=0;i<enemies.length; i++) {
         enemies[i].draw(context, camera.xView, camera.yView);
       }
       
-      player.draw(context, camera.xView, camera.yView,Game.cores);
+      player.draw(context, camera.xView, camera.yView,Game.utilities);
       if (followObjectShow) {
         followObject.draw(context,camera.xView,camera.yView)
       }
@@ -127,17 +146,7 @@
       draw();
     }
     
-    Game.activePlayer = player
-    Game.activeCamera = camera
-    Game.activefollowObject = followObject
-    Game.activeEnemy = enemy
-    Game.markers = markers
-    Game.projectiles = projectiles
-    Game.cores = cores
-    Game.firing = firing
-    Game.debounce = debounce
-    Game.delay = delay
-    Game.enemies = enemies
+
   
   })();
   
@@ -149,29 +158,29 @@
   };
   
   window.addEventListener("keydown", function(e) {
-    if (e.keyCode == 37 || e.keyCode == 65) {
+    if (e.key == 'a' || e.key == 'ArrowLeft') {
       Game.controls.left = true;
-    } else if (e.keyCode == 38 || e.keyCode == 87) {
+    } else if (e.key == 'w' || e.key == 'ArrowUp') {
       Game.controls.up = true;
-    } else if (e.keyCode == 39 || e.keyCode == 68) {
+    } else if (e.key == 'd' || e.key == 'ArrowRight') {
       Game.controls.right = true
-    } else if (e.keyCode == 40 || e.keyCode == 83) {
+    } else if (e.key == 's' || e.key == 'ArrowDown') {
       Game.controls.down = true;
-    } else if (e.keyCode == 70) {
-      Game.activePlayer.pickUp(Game.cores);
-    } else if (e.keyCode == 82) {
+    } else if (e.key == 'f') {
+      Game.activePlayer.pickUp(Game.utilities);
+    } else if (e.key == 'r') {
       Game.activePlayer.useUtility();
     }
   }, false);
   
   window.addEventListener("keyup", function(e) {
-    if (e.keyCode == 37 || e.keyCode == 65) {
+    if (e.key == 'a' || e.key == 'ArrowLeft') {
       Game.controls.left = false;
-    } else if (e.keyCode == 38 || e.keyCode == 87) {
+    } else if (e.key == 'w' || e.key == 'ArrowUp') {
       Game.controls.up = false;
-    } else if (e.keyCode == 39 || e.keyCode == 68) {
+    } else if (e.key == 'd' || e.key == 'ArrowRight') {
       Game.controls.right = false;
-    } else if (e.keyCode == 40 || e.keyCode == 83) {
+    } else if (e.key == 's' || e.key == 'ArrowDown') {
       Game.controls.down = false;
     } 
   }, false);
@@ -224,46 +233,46 @@
     
     text("Spawn:",580,25)
       
-  }
-  
+  }*/
+
+
   function setup() {
     let spawnInput = createInput("");
     spawnInput.position(580,690)
     spawnInput.size(150)
-    spawnInput.input(spawnCore)
+    spawnInput.input(spawnUtility)
   }
-  */
   
-  function spawnCore() {
+  function spawnUtility() {
     if (this.value() == "v1") {
-      let core = new Core(Game.activePlayer.x-40,Game.activePlayer.y-40,"v",1,false,null)
+      let utility = new Utility(Game.activePlayer.x-40,Game.activePlayer.y-40,"v",1,false,null)
       
-      Game.cores.push(core)
+      Game.utilities.push(utility)
     }
     if (this.value() == "v2") {
-      let core = new Core(Game.activePlayer.x-40,Game.activePlayer.y-40,"v",2,false,null)
+      let utility = new Utility(Game.activePlayer.x-40,Game.activePlayer.y-40,"v",2,false,null)
       
-      Game.cores.push(core)
+      Game.utilities.push(utility)
     }
     if (this.value() == "v3") {
-      let core = new Core(Game.activePlayer.x-40,Game.activePlayer.y-40,"v",3,false,null)
+      let utility = new Utility(Game.activePlayer.x-40,Game.activePlayer.y-40,"v",3,false,null)
       
-      Game.cores.push(core)
+      Game.utilities.push(utility)
     }
     if (this.value() == "v4") {
-      let core = new Core(Game.activePlayer.x-40,Game.activePlayer.y-40,"v",4,false,null)
+      let utility = new Utility(Game.activePlayer.x-40,Game.activePlayer.y-40,"v",4,false,null)
       
-      Game.cores.push(core)
+      Game.utilities.push(utility)
     }
     if (this.value() == "u1") {
-      let core = new Core(Game.activePlayer.x-40,Game.activePlayer.y-40,"u",1,false,null)
+      let utility = new Utility(Game.activePlayer.x-40,Game.activePlayer.y-40,"u",1,false,null)
       
-      Game.cores.push(core)
+      Game.utilities.push(utility)
     }
     if (this.value() == "p1") {
-      let core = new Core(Game.activePlayer.x-40,Game.activePlayer.y-40,"p",1,false,null)
+      let utility = new Utility(Game.activePlayer.x-40,Game.activePlayer.y-40,"p",1,false,null)
       
-      Game.cores.push(core)
+      Game.utilities.push(utility)
     }
     
     
@@ -274,7 +283,6 @@
       
     }
   }
-  
   
   function draw() {
     Game.gameLoop()

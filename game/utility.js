@@ -1,4 +1,4 @@
-class Core {
+class Utility {
     constructor(x,y,type,num,drop,playerAngle) {
       this.position = createVector(x,y)
       
@@ -158,4 +158,4 @@ class Core {
     }
   }
   
-  Game.core = Core
+  Game.utility = Utility;

@@ -22,12 +22,14 @@ class Camera {
       this.worldRect = new Game.Rectangle(0, 0, worldWidth, worldHeight);
     }
   
+
+    //Follows the game object
     follow(gameObject, xDeadZone, yDeadZone) {
       this.followed = gameObject;
       this.xDeadZone = xDeadZone;
       this.yDeadZone = yDeadZone;
     }
-  
+
     update() {
       if (this.followed != null) {
         if (this.followed.x - this.xView + this.xDeadZone > this.wView)

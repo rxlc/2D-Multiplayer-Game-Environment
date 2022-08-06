@@ -19,7 +19,7 @@ class Player {
   
       this.angleOffset = -1.54;
   
-      this.vmode = 1;
+      this.vmode = 4;
       this.umode = 1;
       this.pmode = 1;
       
@@ -61,7 +61,7 @@ class Player {
           replacedNum = this.umode
         }
         
-        let replacedCore = new Core(this.x,this.y,replacedType,replacedNum,true,this.angle)
+        let replacedCore = new Utility(this.x,this.y,replacedType,replacedNum,true,this.angle)
         
         if (replacedType == "v") {
           this.vmode = coresList[closestIndex].num
@@ -200,7 +200,16 @@ class Player {
           this.yVel -= this.acceleration;
         }
       }
-  
+
+      if (this.yVel >= -0.1 && this.yVel <= 0.1 && (Game.controls.up == false)&&(Game.controls.down == false)) {
+        this.yVel = 0;
+      }
+      
+      if (this.xVel >= -0.1 && this.xVel <= 0.1 && (Game.controls.left == false)&&(Game.controls.right == false)) {
+        this.xVel = 0;
+      }
+
+
       this.localmousex = mouseX - window.innerWidth / 2;
       this.localmousey = mouseY + window.innerHeight / 2;
   
