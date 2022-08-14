@@ -23,6 +23,8 @@ function init() {
   //Dictonary for keeping the other players with their socket id
   var otherPlayers = {};
 
+  var clientProjectiles = [];
+
   //Creating the player for this specific client
   var player = new Game.Player(Math.floor(Math.random()*1500)+250,Math.floor(Math.random()*1500)+250);
 
@@ -53,13 +55,28 @@ function init() {
     //Checks for disconnected player
     for (var id in otherPlayers) {
       if (playersFound[id] == undefined) {
-        console.log("Other players disconnected")
         delete otherPlayers[id];
       }
     }
 
   });
 
+  socket.on('update-projectiles', function(serverProjectiles) {
+    for (let i=0; i < serverProjectiles.length; i++) {
+      if (clientProjectiles[i] == undefined) {
+        clientProjectiles[i] = new clientProjectile(serverProjectiles[i].x,serverProjectiles[i].y,serverProjectiles[i].radius,serverProjectiles[i].color,serverProjectiles[i].opacity); 
+      } else {
+        clientProjectiles[i].x = serverProjectiles[i].x;
+        clientProjectiles[i].y = serverProjectiles[i].y;
+        clientProjectiles[i].opacity = serverProjectiles[i].opacity;
+      }
+    }
+
+    for (let i=serverProjectiles.length; i<clientProjectiles.length; i++) {
+      clientProjectiles.splice(i,1);
+      i--;
+    }
+  });
 
   //Checking latency
   var startTime;
@@ -74,8 +91,6 @@ function init() {
 
     Game.latency = latency;
   });
-
-  var projectiles = [];
   
   var hitmarkers = [];
 
@@ -100,21 +115,15 @@ function init() {
   Game.activeCamera = camera
   Game.activefollowObject = followObject
   Game.hitmarkers = hitmarkers
-  Game.projectiles = projectiles
   Game.firing = firing
   Game.debounce = debounce
   Game.delay = delay
 
   var update = function() {
-
     followObject.update(camera.xView,camera.yView);
     
     player.update(room.width, room.height, camera.xView, camera.yView);
-    
-    for (let i=0; i<projectiles.length; i++) {
-      projectiles[i].update(Game.projectiles);
-    }
-    
+
     for (let i=0; i<hitmarkers.length; i++) {
       hitmarkers[i].update(Game.hitmarkers);
     }
@@ -123,7 +132,7 @@ function init() {
     
     if (Game.firing) {
       if (Game.debounce == false) {
-        Game.activePlayer.shoot(Game.projectiles);
+        Game.activePlayer.shoot(Game.projectiles,socket);
         Game.debounce = true;
       } else {
         Game.delay++;
@@ -158,11 +167,11 @@ function init() {
     if (followObjectShow) {
       followObject.draw(context,camera.xView,camera.yView)
     }
-    
-    for (let i=0; i<projectiles.length; i++) {
-      projectiles[i].draw(context,camera.xView,camera.yView)
+
+    for (let i=0; i<clientProjectiles.length; i++) {
+      clientProjectiles[i].draw(context,camera.xView,camera.yView);
     }
-    
+
     for (let i=0;i< hitmarkers.length; i++) {
       hitmarkers[i].draw(context,camera.xView,camera.yView);
     }

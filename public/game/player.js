@@ -20,8 +20,6 @@ class Player {
       this.angleOffset = -1.54;
   
       this.vmode = 1;
-      this.umode = 1;
-      this.pmode = 1;
       
       this.modeDisplay = false;
       this.modeDisplayTime = 0;
@@ -31,8 +29,7 @@ class Player {
       
     }
   
-    update(worldWidth, worldHeight, xView, yView) {
-      
+    update(worldWidth, worldHeight, xView, yView) {      
       if (this.uCooldown) {
         if (this.uTimer < 400) {
           this.uTimer++
@@ -281,7 +278,7 @@ class Player {
       context.restore();
     }
   
-    shoot(projectileList) {
+    shoot(projectileList,socket) {
       let angle = this.angle;
   
       angle = angle + Math.random() * (this.spread * 2) - this.spread;
@@ -290,31 +287,16 @@ class Player {
       let yVel = Math.sin(angle);
       
       if (this.vmode == 1) {
-        let projectile = new Game.Projectile(
-          this.x,
-          this.y,
-          this.size,
-          { r: 247, g: 110, b: 37 },
-          xVel,
-          yVel,
-          this.bulletSpeed,
-          this.range,
-          0,
-          40,
-          this.angle,
-          this.damage
-        );
-  
-        projectileList.push(projectile);
+        socket.emit('shoot',{x: this.x, y: this.y, size: this.size, color: {r: 124, g:198, b:254}, xVel: xVel, yVel: yVel, bulletSpeed: this.bulletSpeed, range: this.range, offsetX: 0, offsetY: 40, angle: this.angle, damage: this.damage});        
       }
-  
+      /*
       if (this.vmode == 2) {
         for (let i = 0; i < 2; i++) {
           let projectile = new Game.Projectile(
             this.x,
             this.y,
             this.size,
-            { r: 247, g: 110, b: 37 },
+            { r: 124, g: 198, b: 254 },
             xVel,
             yVel,
             this.bulletSpeed,
@@ -334,7 +316,7 @@ class Player {
           this.x,
           this.y,
           this.size,
-          { r: 247, g: 110, b: 37 },
+          { r: 124, g: 198, b: 254 },
           xVel,
           yVel,
           this.bulletSpeed,
@@ -362,7 +344,7 @@ class Player {
           this.x,
           this.y,
           this.size,
-          { r: 247, g: 110, b: 37 },
+          { r: 124, g: 198, b: 254 },
           xVel,
           yVel,
           (Math.random()*this.bulletSpeed)+4,
@@ -376,6 +358,7 @@ class Player {
         projectileList.push(projectile);
         }
       }
+      */
     }
     
   }

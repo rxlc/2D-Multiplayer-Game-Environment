@@ -2,6 +2,8 @@
 var express = require('express');
 var socket = require('socket.io');
 
+var projectileObject = require('./public/game/projectile.js').projectileObject
+
 //Reference the express function and run it
 var app = express();
 
@@ -17,7 +19,7 @@ var io = socket(server);
 //Dictionary to keep track of all players with their socket id
 var players = {};
 
-var bulletArray = [];
+var projectileArray = [];
 
 //Calls when a connection is established, each user has their own individual socket
 io.on('connection', function(socket){
@@ -33,7 +35,6 @@ io.on('connection', function(socket){
     /*
       console.log("New player position info:",data);
     */
-    
       players[socket.id] = data;
 
       io.emit('update-players',players);
@@ -60,5 +61,35 @@ io.on('connection', function(socket){
     //Listens for shoot event and add to bullet array
     socket.on('shoot',function(data){
         if (players[socket.id] == undefined) return;
+            var newProjectile = new projectileObject(data.x,data.y,data.size,data.color,data.xVel, data.yVel, data.bulletSpeed, data.range, data.offsetX, data.offsetY, data.angle, data.damage);
+
+            data.ownerId = socket.id;
+            projectileArray.push(newProjectile);
     });
 })
+
+function serverLoop() {
+    for (let i=0; i<projectileArray.length; i++) {
+        let currentProjectile = projectileArray[i];
+
+        currentProjectile.update(projectileArray);
+
+        /*
+        for (var id in players) {
+            if (projectile.ownerId != id) {
+                var dx = players[id].x - currentProjectile.x;
+                var dy = players[id].y - currentProjectile.y;
+                var dist = Math.sqrt(dx*dx + dy * dy);
+
+                if (dist < 50) {
+                    io.emit('player-hit',id);
+                }
+            }
+        }
+        */
+    }
+
+    io.emit("update-projectiles",projectileArray);
+}
+
+setInterval(serverLoop,16);
