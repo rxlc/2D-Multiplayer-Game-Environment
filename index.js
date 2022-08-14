@@ -6,9 +6,7 @@ var socket = require('socket.io');
 var app = express();
 
 //Listen for requests in a specific port number
-var server = app.listen(4000, function(){
-    console.log("Listening to requests on port 4000");
-});
+var server = app.listen(process.env.PORT || 4000)
 
 //Automatically display the index.html file in the public folder
 app.use(express.static('public'));
