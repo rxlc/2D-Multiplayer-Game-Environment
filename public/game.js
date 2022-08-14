@@ -1,7 +1,7 @@
 window.onload = init;
 
 function init() {
-  var socket = io.connect('http://localhost:4000');
+  var socket = io.connect('https://lit-citadel-79320.herokuapp.com');
 
   var canvas = document.getElementById("gameCanvas");
   var context = canvas.getContext("2d");
