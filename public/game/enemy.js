@@ -20,7 +20,6 @@ class Enemy {
   
       this.health = 100;
   
-      this.enemyMove = false;
   
       this.timing = 0;
   

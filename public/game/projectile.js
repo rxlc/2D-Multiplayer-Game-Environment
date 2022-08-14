@@ -29,6 +29,8 @@ class Projectile {
   
       this.xVel = xVel;
       this.yVel = yVel;
+
+      this.ownerId = undefined;
   
       this.mag = this.xVel * this.xVel + this.yVel * this.yVel;
   

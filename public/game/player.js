@@ -13,32 +13,78 @@ class Player {
   
       this.side = 50;
   
-      this.r = 154;
-      this.g = 134;
-      this.b = 164;
-  
       this.angleOffset = -1.54;
   
       this.vmode = 1;
       
       this.modeDisplay = false;
       this.modeDisplayTime = 0;
-      
-      this.uCooldown = false
-      this.uTimer = 0;
-      
+
+
+      this.color = {
+        r: 255,
+        g: 255,
+        b: 255,
+      };
+  
+      this.orgColor = {
+        r: 154,
+        g: 134,
+        b: 164,
+      };
+  
+      this.timing = 0;
+  
+      this.rdiff = (255 - this.orgColor.r) / 50;
+      this.gdiff = (255 - this.orgColor.g) / 50;
+      this.bdiff = (255 - this.orgColor.b) / 50;
+  
+      this.rdiffDown = (66 - this.orgColor.r) / 30;
+      this.gdiffDown = (63 - this.orgColor.g) / 30;
+      this.bdiffDown = (62 - this.orgColor.b) / 30;
+  
+      this.hit = false;
+    }
+
+    hitReaction(markerList,damage) {
+      this.hit = true;
+      if (this.timing > 10) {
+        let marker = new Game.hitmarker(this.x,this.y,damage)
+        
+        markerList.push(marker);
+      }
     }
   
-    update(worldWidth, worldHeight, xView, yView) {      
-      if (this.uCooldown) {
-        if (this.uTimer < 400) {
-          this.uTimer++
+    update(worldWidth, worldHeight, xView, yView) {   
+
+      this.color.r = this.orgColor.r + this.rdiff * this.timing;
+      this.color.g = this.orgColor.g + this.gdiff * this.timing;
+      this.color.b = this.orgColor.b + this.bdiff * this.timing;
+    
+      if (this.hit) {
+        if (this.timing < 50) {
+          this.timing += 10;
+        }
+        this.timeAfterHit = 0;
+        this.healthAlpha = 1;
+      } else {
+        if (this.timing > 0) {
+          this.timing -= 5;
+        }
+
+        this.timeAfterHit++;
+      }
+
+      if (this.timeAfterHit >= 100) {
+        if (this.health < 100) {
+          this.health += 0.3;
         } else {
-          this.uTimer = 0;
-          this.uCooldown = false;
+          this.health = 100;
         }
       }
-      
+
+
+
       if (this.vmode == 1) {
         this.damage = 15;
         this.fireDelay = 35;
@@ -254,8 +300,20 @@ class Player {
       context.translate(pivotX, pivotY);
   
       context.rotate(this.angle + this.angleOffset);
-  
-      context.fillStyle = "rgba(" + this.r + "," + this.g + "," + this.b + "1)";
+      /*
+      context.fillStyle =
+      "rgba(" +
+      this.color.r +
+      "," +
+      this.color.g +
+      "," +
+      this.color.b +
+      "," +
+      this.opacity +
+      ")";
+      */
+
+      context.fillStyle = "rgba(154,132,164,1)"
   
       context.lineWidth = 5;
   
@@ -278,7 +336,7 @@ class Player {
       context.restore();
     }
   
-    shoot(projectileList,socket) {
+    shoot(socket) {
       let angle = this.angle;
   
       angle = angle + Math.random() * (this.spread * 2) - this.spread;
@@ -289,27 +347,26 @@ class Player {
       if (this.vmode == 1) {
         socket.emit('shoot',{x: this.x, y: this.y, size: this.size, color: {r: 124, g:198, b:254}, xVel: xVel, yVel: yVel, bulletSpeed: this.bulletSpeed, range: this.range, offsetX: 0, offsetY: 40, angle: this.angle, damage: this.damage});        
       }
-      /*
+      
       if (this.vmode == 2) {
         for (let i = 0; i < 2; i++) {
-          let projectile = new Game.Projectile(
-            this.x,
-            this.y,
-            this.size,
-            { r: 124, g: 198, b: 254 },
-            xVel,
-            yVel,
-            this.bulletSpeed,
-            this.range,
-            -15 + i * 30,
-            40,
-            this.angle,
-            this.damage
-          );
-  
-          projectileList.push(projectile);
+          socket.emit('shoot',{
+            x: this.x,
+            y: this.y,
+            size: this.size,
+            color: { r: 124, g: 198, b: 254 },
+            xVel: xVel,
+            yVel: yVel,
+            bulletSpeed: this.bulletSpeed,
+            range: this.range,
+            offsetX: -15 + i * 30,
+            offsetY: 40,
+            angle: this.angle,
+            damage: this.damage
+          });
         }
       }
+      /*
   
       if (this.vmode == 3) {
         let projectile = new Game.Projectile(

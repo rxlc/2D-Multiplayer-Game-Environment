@@ -63,7 +63,7 @@ io.on('connection', function(socket){
         if (players[socket.id] == undefined) return;
             var newProjectile = new projectileObject(data.x,data.y,data.size,data.color,data.xVel, data.yVel, data.bulletSpeed, data.range, data.offsetX, data.offsetY, data.angle, data.damage);
 
-            data.ownerId = socket.id;
+            newProjectile.ownerId = socket.id;
             projectileArray.push(newProjectile);
     });
 })
@@ -74,19 +74,19 @@ function serverLoop() {
 
         currentProjectile.update(projectileArray);
 
-        /*
         for (var id in players) {
-            if (projectile.ownerId != id) {
+            if (currentProjectile.ownerId != id) {
+                
                 var dx = players[id].x - currentProjectile.x;
                 var dy = players[id].y - currentProjectile.y;
                 var dist = Math.sqrt(dx*dx + dy * dy);
 
                 if (dist < 50) {
-                    io.emit('player-hit',id);
+                    io.emit('player-hit',{id: id, damage: currentProjectile.damage});
+                    projectileArray.splice(i,1);
                 }
             }
         }
-        */
     }
 
     io.emit("update-projectiles",projectileArray);

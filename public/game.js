@@ -2,6 +2,9 @@ window.onload = init;
 
 function init() {
   var socket = io.connect('https://lit-citadel-79320.herokuapp.com');
+  /*
+  var socket = io.connect('http://localhost:4000');
+  */
 
   var canvas = document.getElementById("gameCanvas");
   var context = canvas.getContext("2d");
@@ -78,6 +81,14 @@ function init() {
     }
   });
 
+  socket.on('player-hit',function(data) {
+    if (data.id == socket.id) {
+      player.hitReaction(hitmarkers,data.damage);
+    } else {
+      
+    }
+  });
+
   //Checking latency
   var startTime;
 
@@ -120,6 +131,8 @@ function init() {
   Game.delay = delay
 
   var update = function() {
+    console.log(hitmarkers.length);
+
     followObject.update(camera.xView,camera.yView);
     
     player.update(room.width, room.height, camera.xView, camera.yView);
@@ -132,7 +145,7 @@ function init() {
     
     if (Game.firing) {
       if (Game.debounce == false) {
-        Game.activePlayer.shoot(Game.projectiles,socket);
+        Game.activePlayer.shoot(socket);
         Game.debounce = true;
       } else {
         Game.delay++;

@@ -1,20 +1,25 @@
 class hitmarker {
     constructor(x,y,damage) {
-      this.position = createVector(x+(Math.random()*50)-25,y+(Math.random()*20)-10)
-      this.velocity = createVector(0,-3)
-      this.acceleration = createVector(0,0.1)
+      this.x = x+(Math.random()*50)-25
+      this.y = y+(Math.random()*20)-10
+      this.velX = 0
+      this.velY = -3
+      this.accelX = 0
+      this.accelY = 0.1
       
       this.damage = damage
       this.opacity = 1;
     }
     
     update(markerList) {
-      this.position.add(this.velocity)
+      this.x = this.x + this.velX
+      this.y = this.y + this.velY
       
-      if (this.velocity.y < 0) {    
-        this.velocity.add(this.acceleration)
+      if (this.velY < 0) {    
+        this.velX+=this.accelX;
+        this.velY+=this.accelY;
       } else {
-        this.velocity.y = 0;
+        this.velY = 0;
       }
       
       if (this.opacity > 0) {
@@ -28,8 +33,8 @@ class hitmarker {
     draw(context,xView,yView) {
       context.save();
       
-      let localX = this.position.x - xView
-      let localY = this.position.y - yView
+      let localX = this.x - xView
+      let localY = this.y - yView
       
       context.font = "16px sans-serif";
       context.fillStyle = 
