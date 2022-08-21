@@ -1,9 +1,9 @@
 window.onload = init;
 
 function init() {
-  var socket = io.connect('https://lit-citadel-79320.herokuapp.com');
-  /*
   var socket = io.connect('http://localhost:4000');
+  /*
+  var socket = io.connect('https://lit-citadel-79320.herokuapp.com');  
   */
 
   var canvas = document.getElementById("gameCanvas");
@@ -131,8 +131,6 @@ function init() {
   Game.delay = delay
 
   var update = function() {
-    console.log(hitmarkers.length);
-
     followObject.update(camera.xView,camera.yView);
     
     player.update(room.width, room.height, camera.xView, camera.yView);
